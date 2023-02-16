@@ -105,7 +105,7 @@ TestExportInvoices.prototype.testInvoicesVatIncluded = function(){
 }
 
 //Export Invoices VAT excluded
-TestExportInvoices.prototype.testInvoicesVatIncluded = function(){
+TestExportInvoices.prototype.testInvoicesVatExcluded = function(){
 	//get the *ac2 file
 	let fileAC2 = "file:script/../test/testcases/invoices_vat_excluded_test.ac2";
 	let banDoc = Banana.application.openDocument(fileAC2);

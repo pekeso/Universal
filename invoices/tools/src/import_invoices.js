@@ -36,7 +36,6 @@ function exec(string) {
     let transactionsHeader = transactions[0];
     transactions.splice(0, 1);
     let transactionsObjs = Banana.Converter.arrayToObject(transactionsHeader, transactions, true);
-    // Banana.Ui.showText(JSON.stringify(transactionsObjs));
 
     let format_invs = createFormatInvs(banDoc);
     if (format_invs.match(transactionsObjs))
@@ -85,8 +84,7 @@ class formatInvs {
 
     constructor(banDocument) {
         this.placeholder = "";
-        this.invoiceNetTotal = "";
-        this.invoiceNetTotalAfterDisc = "";
+        this.invoiceTotalToPay = "";
         this.invoiceVatTotal = "";
         this.NetTotalIsOk = false;
         this.VatTotalIsOk = false;
@@ -129,6 +127,19 @@ class formatInvs {
             return false;
     }
 
+    isVatExcl(vat_mode) {
+        if (!vat_mode) {
+            return true;
+        } else if (vat_mode === "vat_excl") {
+            return true;
+        } else if (vat_mode === "vat_none") {
+            return false;
+        } else if (vat_mode === "vat_incl") {
+            return false;
+        }
+        return true; // default is vat excl
+    }
+
     convertInDocChange(transactionsObjs, initJsonDoc) {
         let jsonDoc = [];
         let docInfo = getDocumentInfo();
@@ -138,22 +149,27 @@ class formatInvs {
         /* Iterate over the rows and create object */
         for (let trRow in transactionsObjs) {
             let invoiceTransaction = transactionsObjs[trRow];
-            // Banana.Ui.showText(JSON.stringify(invoiceTransaction));
             
             if (this.placeholder !== invoiceTransaction["InvoiceNumber"]) {
                 invoiceObj = this.setInvoiceStructure(invoiceTransaction, docInfo);
                 invoiceObj.items = this.setInvoiceStructure_items(transactionsObjs, invoiceTransaction["InvoiceNumber"]);
-                // Banana.Ui.showText(JSON.stringify(invoiceObj));
-
-                // Recalculate invoice
-                if(!invoiceObj.billing_info)
-                    invoiceObj.billing_info = {};
-
-                invoiceObj.billing_info.discount = {};
-                if(this.discountTotal == "0"){
-                    this.discountTotal = null;
+                
+                if (invoiceTransaction["InvoiceDiscount"]) {
+                    invoiceObj.billing_info.discount = {
+                        amount_vat_exclusive: this.isVatExcl(invoiceTransaction["InvoiceAmountType"]) ? invoiceTransaction["InvoiceDiscount"] : null,
+                        amount_vat_inclusive: this.isVatExcl(invoiceTransaction["InvoiceAmountType"]) ? null : invoiceTransaction["InvoiceDiscount"],
+                    };
                 }
-                invoiceObj.billing_info.discount.amount_vat_exclusive=this.discountTotal;
+
+                // if (invoiceTransaction["ItemDiscount"]) {
+                //     for(let i = 0; i < invoiceObj.items.length; i++) {
+                //         invoiceObj.items[i].discount = {
+                //             amount: invoiceTransaction["ItemDiscount"] ? invoiceTransaction["ItemDiscount"] : null
+                //         };
+                //     }
+                // }
+                // Banana.Ui.showText(JSON.stringify(invoiceObj));
+                // Recalculate invoice
                 invoiceObj = JSON.parse(this.banDoc.calculateInvoice(JSON.stringify(invoiceObj)));
 
                 // check that the information in the billing info property coincides with the totals taken from the invoice lines
@@ -168,11 +184,12 @@ class formatInvs {
 
                 rows.push(row);
 
-                this.invoiceNetTotal = "";
+                this.invoiceTotalToPay = "";
                 this.invoiceVatTotal = "";
                 this.discountTotal = "";
             }
-            this.placeHolder = invoiceTransaction["InvoiceNumber"];
+            
+            this.placeholder = invoiceTransaction["InvoiceNumber"];
         }
         let dataUnitTransactions = {};
         dataUnitTransactions.nameXml = "Invoices";
@@ -191,49 +208,37 @@ class formatInvs {
 
         let msg = this.getInvoiceErrorMessage(this.ID_ERR_AMOUNTS_WITH_DIFFERENCES,this.lang,invoiceObj.document_info.number);
   
-        if(invoiceObj.billing_info.total_amount_vat_exclusive_before_discount==this.invoiceNetTotal){
-           this.NetTotalIsOk=true;
-        }else{
-           Banana.application.addMessage(msg,this.ID_ERR_AMOUNTS_WITH_DIFFERENCES);
-           /*Banana.console.debug("excl vat file"+this.invoiceNetTotal);
-           Banana.console.debug("excl vat calculated"+invoiceObj.billing_info.total_amount_vat_exclusive_before_discount);*/
+        // Verifiy calculated total amount is the same as in the imported file
+        if (this.invoiceTotalToPay) {
+            if (Banana.SDecimal.compare(invoiceObj.billing_info.total_to_pay, this.invoiceTotalToPay) === 0) {
+               this.NetTotalIsOk=true;
+            }else{
+               Banana.application.addMessage(
+                    qsTr("The calculated amount for invoice %1 is different from the amount in the imported file. Calculated amount %2, amount imported file: %3")
+                        .arg(invoiceObj.document_info.number).arg(invoiceObj.billing_info.total_to_pay).arg(this.invoiceTotalToPay),
+                    this.ID_ERR_AMOUNTS_WITH_DIFFERENCES);
+            }
         }
-        if(invoiceObj.billing_info.total_amount_vat_inclusive==this.invoiceVatTotal){
-           this.VatTotalIsOk=true;
-        }else{
-           Banana.application.addMessage(msg,this.ID_ERR_AMOUNTS_WITH_DIFFERENCES);
-          /* Banana.console.debug("incl vat file"+this.invoiceVatTotal);
-           Banana.console.debug("incl vat calculated"+invoiceObj.billing_info.total_amount_vat_inclusive);*/
+
+        if (this.invoiceVatTotal) {
+            if (Banana.SDecimal.compare(invoiceObj.billing_info.total_vat_amount, this.invoiceVatTotal) === 0) {
+               this.VatTotalIsOk=true;
+            } else {
+                Banana.application.addMessage(
+                     qsTr("The calculated vat amount for invoice %1 is different from the amount in the imported file. Calculated vat amount %2, amount imported file: %3")
+                         .arg(invoiceObj.document_info.number).arg(invoiceObj.billing_info.total_vat_amount).arg(this.invoiceVatTotal),
+                     this.ID_ERR_AMOUNTS_WITH_DIFFERENCES);
+            }
         }
   
         return true;
     }
 
-    getTranslateWords(language){
+    getTranslateWords(){
         let transWords = {};
-     
-        if (language.length > 2) {
-           language = language.substr(0, 2);
-        }
-     
-        switch(language){
-            case  'it':
-              transWords.invoice = "Fattura";
-              transWords.reference = "N. di riferimento: ";
-              break;
-           case 'fr':
-              transWords.invoice = "Facture";
-              transWords.reference = "N. de la facture: ";
-              break;
-           case 'de':
-              transWords.invoice = "Rechnung";
-              transWords.reference = "Rechnungsnummer: ";
-              break;
-           default:
-              transWords.invoice = "Invoice";
-              transWords.reference = "Reference nr: ";
-              break;
-        }
+
+        transWords.invoice = qsTr("Invoice");
+        transWords.reference = qsTr("Reference nr: ");
      
         return transWords;
     }
@@ -248,6 +253,7 @@ class formatInvs {
         
         invoiceObj.creator_info = this.setInvoiceStructure_creatorInfo();
         invoiceObj.author_info = {};
+        invoiceObj.billing_info = {};
         invoiceObj.customer_info = this.setInvoiceStructure_customerInfo(invoiceTransaction);
         invoiceObj.document_info = this.setInvoiceStructure_documentInfo(invoiceTransaction, transWord);
         invoiceObj.note = {};
@@ -258,6 +264,10 @@ class formatInvs {
         invoiceObj.type = "invoice";
         invoiceObj.version = "1.0";
 
+        // save invoice's totals to verify that the totals match after recalculate
+        this.invoiceTotalToPay = Banana.SDecimal.add(this.invoiceTotalToPay,invoiceTransaction["InvoiceTotalToPay"],{'decimals':2});
+        this.invoiceVatTotal = Banana.SDecimal.add(this.invoiceVatTotal,invoiceTransaction["InvoiceVatTotal"],{'decimals':2});
+        this.discountTotal = Banana.SDecimal.add(this.invoiceVatTotal,invoiceTransaction["InvoiceDiscount"],{'decimals':2});
 
         return invoiceObj;
     }
@@ -359,9 +369,9 @@ class formatInvs {
         let invoiceObj_documentInfo = {};
   
         invoiceObj_documentInfo.currency = invoiceTransaction["InvoiceCurrency"];
-        invoiceObj_documentInfo.date = Banana.Converter.toInternalDateFormat(invoiceTransaction["InvoiceDate"]);
+        invoiceObj_documentInfo.date = invoiceTransaction["InvoiceDate"];
         invoiceObj_documentInfo.decimals_amounts = 2;
-        invoiceObj_documentInfo.description = transWord.invoice;
+        invoiceObj_documentInfo.description = invoiceTransaction["InvoiceDescription"] ? invoiceTransaction["InvoiceDescription"] : transWord;
         invoiceObj_documentInfo.doc_type = "";
         invoiceObj_documentInfo.locale = "";
         invoiceObj_documentInfo.number = invoiceTransaction["InvoiceNumber"];
@@ -370,19 +380,16 @@ class formatInvs {
         invoiceObj_documentInfo.printed = "";
         invoiceObj_documentInfo.rounding_total = "";
         invoiceObj_documentInfo.type = "";
-        // invoiceObj_documentInfo.text_begin = transWord.reference + invoiceTransaction["esr_number"];
-        invoiceObj_documentInfo.vat_mode = "vat_excl";
-  
+        invoiceObj_documentInfo.vat_mode = invoiceTransaction["InvoiceAmountType"] ? invoiceTransaction["InvoiceAmountType"] : "vat_excl";
   
         return invoiceObj_documentInfo;
-  
     }
 
     setInvoiceStructure_items(invoiceTransactions, ref_number){
         let invoiceArr_items = [];
         for(let row in invoiceTransactions){
            let invTransaction = invoiceTransactions[row];
-        //    Banana.Ui.showText(JSON.stringify(invTransaction));
+        
            if(invTransaction["InvoiceNumber"] == ref_number){
                 let invoiceObj_items = {};
                 let itemDescription = invTransaction["ItemDescription"];
@@ -391,10 +398,18 @@ class formatInvs {
                 invoiceObj_items.mesure_unit = invTransaction["ItemUnit"];
                 invoiceObj_items.number = invTransaction["ItemNumber"];
                 invoiceObj_items.quantity = invTransaction["ItemQuantity"];
-                invoiceObj_items.total = "";
-                invoiceObj_items.total_amount_vat_exclusive = invTransaction["ItemTotal"];
-                invoiceObj_items.total_amount_vat_inclusive = invTransaction["ItemTotal"];
-                // invoiceObj_items.unit_price = this.setInvoiceStructure_items_unitPrice(invTransaction);   
+                invoiceObj_items.discount = {
+                    amount: invTransaction["ItemDiscount"] ? invTransaction["ItemDiscount"] : null
+                };
+                invoiceObj_items.unit_price = {
+                    amount_vat_exclusive: this.isVatExcl(invTransaction["InvoiceAmountType"]) ? invTransaction["ItemUnitPrice"] : null,
+                    amount_vat_inclusive: this.isVatExcl(invTransaction["InvoiceAmountType"]) ? null : invTransaction["ItemUnitPrice"],
+                    vat_code: invTransaction["ItemVatCode"] ? invTransaction["ItemVatCode"] : null,
+                    vat_rate: invTransaction["ItemVatRate"] ? invTransaction["ItemVatRate"] : null
+                }
+                // The next fields are recalculated
+                //invoiceObj_items.total_amount_vat_exclusive = invTransaction["ItemTotal"];
+                //invoiceObj_items.total_amount_vat_inclusive = invTransaction["ItemTotal"];
                 
                 invoiceArr_items.push(invoiceObj_items);
             }
@@ -406,22 +421,14 @@ class formatInvs {
         let unitPrice = {};
   
         unitPrice.amount_vat_exclusive = null;
-        //arrotondare a 4 dec
-        unitPrice.amount_vat_inclusive = Banana.SDecimal.divide(invoiceTransaction["position_nettotal"],invoiceTransaction["position_amount"],{'decimals':4});
+        // round to 4 decimals
+        // unitPrice.amount_vat_inclusive = Banana.SDecimal.divide(invoiceTransaction["position_nettotal"],invoiceTransaction["position_amount"],{'decimals':4});
+        unitPrice.amount_vat_inclusive = this.isVatExcl(invTransaction["InvoiceAmountType"]) ? null : invTransaction["ItemUnitPrice"];
         
         unitPrice.currency = invoiceTransaction["currency"];
-        unitPrice.discount = {};
-        unitPrice.discount.amount = null;
-        unitPrice.discount.percent = null;
+        
         unitPrice.vat_code = "";
-        unitPrice.vat_rate = invoiceTransaction["position_vat"];
-  
-        //salvo i valori per confrontarli con quelli calcolati
-        this.invoiceNetTotal = Banana.SDecimal.add(this.invoiceNetTotal,invoiceTransaction["position_nettotal"],{'decimals':2});
-        this.invoiceVatTotal = Banana.SDecimal.add(this.invoiceVatTotal,invoiceTransaction["position_total"],{'decimals':2});
-  
-        this.discountTotal = Banana.SDecimal.add(this.discountTotal,Banana.SDecimal.subtract(invoiceTransaction["position_nettotal"],invoiceTransaction["position_nettotal_afterdiscount"]));
-
+        unitPrice.vat_rate = invoiceTransaction["ItemVatRate"];
   
         return unitPrice;
   
@@ -468,48 +475,17 @@ class formatInvs {
         return invoiceObj_supplierInfo;
   
     }
-
-    // replaceNewLine(itemDescription){
-    //     let newItemDescription = "";
-    //     if(itemDescription && itemDescription.indexOf("<br>") !== 0){
-    //        newItemDescription = itemDescription.replace("<br>","\n");
-    //        newItemDescription = "\n" + newItemDescription;
-    //        return newItemDescription;
-    //     }
-    //     return newItemDescription;
-    // }
     
     getInvoiceErrorMessage(errorId, lang, refNr){
         if (!lang)
         lang = 'en';
         switch (errorId) {
             case this.ID_ERR_COSTUMERID_NOT_FOUND:
-            if (lang == 'it')
-                return "Id del contatto: "+refNr+" non trovato nella tabella dei contatti. Hai importato i contatti?";
-            else if (lang == 'de')
-                return "Kontakt-ID: "+refNr+" wurde nicht in der Kontakt-Tabelle gefunden. Haben Sie Ihre Kontakte schon importiert? ";
-            else if (lang == 'fr')
-                return "Contact id: "+refNr+" not found in contact table. Did you import the contacts?";
-            else
-                return "Contact id: "+refNr+" not found in contact table. Did you import the contacts?";
+                return qsTr("Contact id: ") + refNr + qsTr(" not found in contact table. Did you import the contacts?");
             case this.ID_ERR_AMOUNTS_WITH_DIFFERENCES:
-            if (lang == 'it')
-                return "L'importo calcolato è diverso da quello presente del tuo file, fattura nr"+": "+refNr;
-            else if (lang == 'de')
-                return "Der berechnete Betrag entspricht nicht demjenigen Ihrer Datei, Rechnungsnummer"+": "+refNr;
-            else if (lang == 'fr')
-                return "The calculated amount is different from the amount in your file, invoice nr"+": "+refNr;
-            else
-                return "The calculated amount is different from the amount in your file, invoice nr"+": "+refNr;  
+                return qsTr("The calculated amount is different from the amount in your file, invoice nr: ") + refNr;  
             case this.ID_ERR_WRONG_INVOICE_TYPE:
-            if (lang == 'it')
-                return "Stai provando ad importare una fattura tipo 'Singola riga',importa invece una fattura tipo 'Dettagliata'";
-            else if (lang == 'de')
-                return "Sie versuchen, eine 'einzeilige' Rechnung zu importieren, importieren Sie stattdessen eine 'detaillierte' Rechnung.";
-            else if (lang == 'fr')
-                return "You are trying to import a 'Single line' invoice, import a 'Detailed' invoice instead.";
-            else
-                return "You are trying to import a 'Single line' invoice, import a 'Detailed' invoice instead.";
+                return qsTr("You are trying to import a 'Single line' invoice, import a 'Detailed' invoice instead.");
         }
         return '';
     }

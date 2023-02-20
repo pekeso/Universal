@@ -64,10 +64,8 @@ TestExportContacts.prototype.testContactsWithCompleteData = function(){
 	//get the *ac2 file
 	let fileAC2 = "file:script/../test/testcases/contacts_testfiles/contacts_complete_data_test.ac2";
 	let banDoc = Banana.application.openDocument(fileAC2);
-	//create a new logger to split the result of this test on a different file.
-	let parentLogger = this.testLogger;
-	this.testLogger = parentLogger.newLogger(Banana.IO.fileCompleteBaseName(fileAC2));
-	if (banDoc) {
+
+    if (banDoc) {
 		let contactsTable = banDoc.table("Contacts");
 		if (contactsTable){
 			let csvData = "";
@@ -86,10 +84,8 @@ TestExportContacts.prototype.testContactsWithMissingData = function(){
 	//get the *ac2 file
 	let fileAC2 = "file:script/../test/testcases/contacts_testfiles/contacts_missing_data_test.ac2";
 	let banDoc = Banana.application.openDocument(fileAC2);
-	//create a new logger to split the result of this test on a different file.
-	let parentLogger = this.testLogger;
-	this.testLogger = parentLogger.newLogger(Banana.IO.fileCompleteBaseName(fileAC2));
-	if (banDoc) {
+
+    if (banDoc) {
 		let contactsTable = banDoc.table("Contacts");
 		if (contactsTable){
 			let csvData = "";

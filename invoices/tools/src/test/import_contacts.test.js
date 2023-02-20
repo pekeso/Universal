@@ -55,9 +55,6 @@ ImportContacts.prototype.testImportContacts = function() {
     this.testLogger.addKeyValue("ImportContacts", "testReport");
     this.testLogger.addComment("Test Contacts import");
 
-    let parentLogger = this.testLogger;
-    this.testLogger = parentLogger.newLogger(Banana.IO.fileCompleteBaseName(this.fileAC2));
-
     let banDoc = Banana.application.openDocument(this.fileAC2);
     let file = Banana.IO.getLocalFile(this.csvContactsFile);
 

@@ -53,8 +53,10 @@ add_custom_target(lrelease
 )
 
 # The target test is used to test the extension
+set(BAN_TEST_EXE_PATH $ENV{BAN_TEST_EXE_PATH} CACHE FILEPATH "Path to BananaPlus executable to be used for tests")
 add_custom_target(test
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/test
+    COMMAND ${BAN_TEST_EXE_PATH} -cmd=runtestsapps -cmd_exit=1 -cmd_p1=${CMAKE_SOURCE_DIR}/${EXTENSION_ID}.sbaa -cmd_op=A
     SOURCES
         test/export_contacts.test.js
         test/export_invoices.test.js

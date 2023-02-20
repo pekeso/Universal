@@ -1,6 +1,6 @@
 // @id = export_invoices
 // @api = 1.0
-// @pubdate = 2022-10-24
+// @pubdate = 2023-02-17
 // @publisher = Banana.ch SA
 // @description = Export invoices
 // @description.de = Rechnungen exportieren
@@ -122,14 +122,16 @@ function generateCsvInvoices(invoicesTable) {
                 }
             }
             catch(e) {
-                Banana.document.addMessage(qsTr("An error occured while exporting the csv invoice! ") + "\n" + qsTr("Error Description: ") + e);
+                row.addMessage(qsTr("An error occured while exporting the csv invoice! ") + "\n" + qsTr("Error Description: ") + e);
+                rowMatched = false;
             }
         }
     }
     if (rowMatched) {
         return header + csv;
     } else {
-        Banana.document.addMessage(qsTr("Complete the missing details first, as listed in the message pane below."));
+        let msg = qsTr("Complete the missing details first, as listed in the message pane below.");
+        Banana.document ? Banana.document.addMessage(msg) : Banana.application.addMessage(msg);
         return "";
     }
     

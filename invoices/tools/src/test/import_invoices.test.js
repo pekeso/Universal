@@ -55,9 +55,6 @@ ImportItems.prototype.testImportItems = function() {
     this.testLogger.addKeyValue("ImportItems", "testReport");
     this.testLogger.addComment("Test Items import");
 
-    let parentLogger = this.testLogger;
-    this.testLogger = parentLogger.newLogger(Banana.IO.fileCompleteBaseName(this.fileAC2));
-
     let banDoc = Banana.application.openDocument(this.fileAC2);
     let file = Banana.IO.getLocalFile(this.csvItemsFile);
 

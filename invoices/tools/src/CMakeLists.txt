@@ -6,6 +6,10 @@ set(EXTENSION_ID "invoice_tools")
 find_package(Qt6 COMPONENTS Core REQUIRED)
 find_package(Qt6 COMPONENTS LinguistTools REQUIRED)
 
+FILE(GLOB_RECURSE TS_FILES *.ts)
+FILE(GLOB_RECURSE JS_FILES *.js)
+FILE(GLOB_RECURSE QML_FILES *.qml)
+
 # The target is used to build the extension to a sbaa package
 # and set the source files for the IDE
 add_custom_target(invoicetools ALL
@@ -14,6 +18,9 @@ add_custom_target(invoicetools ALL
     SOURCES ${EXTENSION_ID}.qrc
     SOURCES invoice_tools.manifest.json
     SOURCES ../README.md
+    SOURCES ${TS_FILES}
+    SOURCES ${JS_FILES}
+    SOURCES ${QML_FILES}
 )
 
 add_dependencies(${PROJECT_NAME} lrelease) #build .qm files when building the sbaa package

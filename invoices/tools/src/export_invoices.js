@@ -1,6 +1,6 @@
 // @id = export_invoices
 // @api = 1.0
-// @pubdate = 2023-02-17
+// @pubdate = 2023-02-21
 // @publisher = Banana.ch SA
 // @description = Export invoices
 // @description.de = Rechnungen exportieren
@@ -23,21 +23,17 @@
  */
 function exec() {
     let invoicesTable = Banana.document.table("Invoices");
-
     if (!invoicesTable) {
         return "";
     }
 
-    let csv = "";
-
     let invoicesData = generateCsvInvoices(invoicesTable);
-
     if (!invoicesData) {
+        Banana.application.showMessages(true); // Be sure the user is notified
+        Banana.document.addMessage(qsTr("Fix errors first, as listed in the pane Messages."));
         return "";
     }
-    csv += invoicesData;
-      
-    return csv;
+    return invoicesData;
 }
 
 function getValue(column) {
@@ -122,17 +118,13 @@ function generateCsvInvoices(invoicesTable) {
                 }
             }
             catch(e) {
-                row.addMessage(qsTr("An error occured while exporting the csv invoice! ") + "\n" + qsTr("Error Description: ") + e);
+                row.addMessage(qsTr("Invoice not valid\nError: %1").arg(e));
                 rowMatched = false;
             }
         }
     }
     if (rowMatched) {
         return header + csv;
-    } else {
-        let msg = qsTr("Complete the missing details first, as listed in the message pane below.");
-        Banana.document ? Banana.document.addMessage(msg) : Banana.application.addMessage(msg);
-        return "";
     }
-    
+    return null;
 }

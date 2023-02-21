@@ -30,7 +30,7 @@ function exec() {
     let invoicesData = generateCsvInvoices(invoicesTable);
     if (!invoicesData) {
         Banana.application.showMessages(true); // Be sure the user is notified
-        Banana.document.addMessage(qsTr("Fix errors first, as listed in the pane Messages."));
+        Banana.document.addMessage(qsTr("Fix errors first, as listed in the pane Messages."), "internal_error");
         return "";
     }
     return invoicesData;
@@ -67,11 +67,11 @@ function generateCsvInvoices(invoicesTable) {
                 let invoiceObj = JSON.parse(invoiceFieldObj.invoice_json);
                 
                 if (!invoiceObj.document_info.date) {
-                    row.addMessage(qsTr("InvoiceDate is a required field"));
+                    row.addMessage(qsTr("%1 is a required field").arg("InvoiceDate"), "InvoiceDate", "missing_field");
                     rowMatched = false;
                 } 
                 if (!invoiceObj.customer_info.number) {
-                    row.addMessage(qsTr("ContactsId is a required field"));
+                    row.addMessage(qsTr("%1 is a required field").arg("CustomerId"), "CustomerId", "missing_field");
                     rowMatched = false;
                 } 
                 
@@ -80,13 +80,13 @@ function generateCsvInvoices(invoicesTable) {
                     let itemUnitPrice = "";
                     let itemDiscount = "";
                     if (!invoiceObj.items[j].description) {
-                        row.addMessage(qsTr("ItemDescription is a required field"));
+                        row.addMessage(qsTr("%1 is a required field").arg("ItemDescription"), "RowId", "missing_field");
                         rowMatched = false;
                         return "";
                     }
                     if (invoiceObj.document_info.vat_mode === "vat_excl") {
                         if (!invoiceObj.items[j].total_amount_vat_exclusive) {
-                            row.addMessage(qsTr("ItemTotal is a required field"));
+                            row.addMessage(qsTr("%1 is a required field").arg("ItemTotal"), "RowId", "missing_field");
                             rowMatched = false;
                             return "";
                         } else {
@@ -96,7 +96,7 @@ function generateCsvInvoices(invoicesTable) {
                         
                     } else {
                         if (!invoiceObj.items[j].total_amount_vat_inclusive) {
-                            row.addMessage(qsTr("ItemTotal is a required field"));
+                            row.addMessage(qsTr("%1 is a required field").arg("ItemTotal"), "RowId", "missing_field");
                             rowMatched = false;
                             return "";
                         } else {
@@ -118,7 +118,7 @@ function generateCsvInvoices(invoicesTable) {
                 }
             }
             catch(e) {
-                row.addMessage(qsTr("Invoice not valid\nError: %1").arg(e));
+                row.addMessage(qsTr("Invoice not valid.\nError: %1").arg(e), "RowId", "internal_error");
                 rowMatched = false;
             }
         }

@@ -188,24 +188,22 @@ TestExportInvoices.prototype.testInvoiceWithThousandItems = function(){
 
 //Export Invoices with 1'000 with Items
 TestExportInvoices.prototype.testInvoiceErrors = function() {
-    return; // skip
-
     //get the *ac2 file
-    let fileAC2 = "file:script/../test/testcases/invoices_testfiles/invoices_errors.ac2";
+    let fileAC2 = "file:script/../test/testcases/invoices_testfiles/invoices_export_errors_test.ac2";
 	let banDoc = Banana.application.openDocument(fileAC2);
-	Test.assert(banDoc);
+    Test.assert(banDoc, `file not found: "${fileAC2}"`);
 
-    banDoc.clearMessages();
     let invoicesTable = banDoc.table("Invoices");
     Test.assert(invoicesTable);
+
+    banDoc.clearMessages();
     let csvData = generateCsvInvoices(invoicesTable);
 	this.testLogger.addCsv("Data", csvData);
 
     let msgs = banDoc.getMessages();
     for (let i = 0; i < msgs.length; ++i) {
         let msg = msgs[i];
-        this.testLogger.addKeyValue("ERROR_ROW_" + msg.rowNr, msg.message);
+        this.testLogger.addKeyValue("ERROR_MSG_ROW_" + msg.rowNr, msg.message);
+        this.testLogger.addKeyValue("ERROR_HELPID_ROW_" + msg.rowNr, msg.helpId);
     }
-
-	Banana.console.log(JSON.stringify(msgs, null, "   "));
 }

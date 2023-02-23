@@ -10,8 +10,18 @@ After you setup the project you will be able to:
 
 ## Visual Studio Code
 
-Create the file .vscode/settings.json and set the requested cmake options.  
-You can take the following example and modify the paths.
+### Install extensions for cmake
+
+Install the following extensions:
+
+- twxs.cmake: CMake language support for Visual Studio Code (twsx)  
+  This is used for syntax highligh.
+- ms-vscode.cmake-tools: CMake Tools (microsoft)  
+  This is used for enabling the cmake pane, where you can build the targets
+
+### Set paths to qt tools and banana plus
+
+Create the file .vscode/settings.json and set the requested cmake options. You can take the following example and modify the paths.
 
 ```json
 {
@@ -24,7 +34,20 @@ You can take the following example and modify the paths.
 }
 ````
 
+### Set editor for *.ts files
+
 Install the following extension:
 
-- twxs.cmake: CMake language support for Visual Studio Code (twsx)
-- ms-vscode.cmake-tools: CMake Tools (microsoft)
+- fabiospampinato.vscode-open-in-application: Open in application extension
+
+Open vscode user setting file and add the editor for *.ts files
+
+```json
+    "openInApplication.applications": {
+        "*.ts": "QtLinguist"
+    }
+```
+
+NB.: in the operating system you have to assign the *.ts to QtLinquist application.
+
+

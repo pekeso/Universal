@@ -77,44 +77,56 @@
         <translation type="vanished">Rechnungen</translation>
     </message>
     <message>
-        <location filename="../export_invoices.js" line="74"/>
         <source>InvoiceDate is a required field</source>
-        <translation>InvoiceDate ist ein erforderliches Feld</translation>
+        <translation type="vanished">InvoiceDate ist ein erforderliches Feld</translation>
     </message>
     <message>
         <source>Contact Id is a required field</source>
         <translation type="vanished">ContactsId ist ein erforderliches Feld</translation>
     </message>
     <message>
-        <location filename="../export_invoices.js" line="78"/>
         <source>ContactsId is a required field</source>
-        <translation>ContactsId ist ein erforderliches Feld</translation>
+        <translation type="vanished">ContactsId ist ein erforderliches Feld</translation>
     </message>
     <message>
-        <location filename="../export_invoices.js" line="87"/>
         <source>ItemDescription is a required field</source>
-        <translation>ItemDescription, innerhalb der Rechnung, ist ein erforderliches Feld</translation>
+        <translation type="vanished">ItemDescription, innerhalb der Rechnung, ist ein erforderliches Feld</translation>
     </message>
     <message>
-        <location filename="../export_invoices.js" line="93"/>
-        <location filename="../export_invoices.js" line="103"/>
         <source>ItemTotal is a required field</source>
-        <translation>ItemTota, innerhalb der Rechnung, ist ein erforderliches Feld</translation>
+        <translation type="vanished">ItemTota, innerhalb der Rechnung, ist ein erforderliches Feld</translation>
     </message>
     <message>
-        <location filename="../export_invoices.js" line="123"/>
         <source>An error occured while exporting the csv invoice! </source>
-        <translation>Beim Exportieren der csv-Rechnung ist ein Fehler aufgetreten! </translation>
+        <translation type="vanished">Beim Exportieren der csv-Rechnung ist ein Fehler aufgetreten! </translation>
     </message>
     <message>
-        <location filename="../export_invoices.js" line="123"/>
         <source>Error Description: </source>
-        <translation>Fehlerbeschreibung: </translation>
+        <translation type="vanished">Fehlerbeschreibung: </translation>
     </message>
     <message>
-        <location filename="../export_invoices.js" line="130"/>
         <source>Complete the missing details first, as listed in the message pane below.</source>
-        <translation>Vervollständigen Sie zunächst die fehlenden Angaben, die im nachstehenden Meldungsfenster aufgeführt sind.</translation>
+        <translation type="vanished">Vervollständigen Sie zunächst die fehlenden Angaben, die im nachstehenden Meldungsfenster aufgeführt sind.</translation>
+    </message>
+    <message>
+        <location filename="../export_invoices.js" line="33"/>
+        <source>Fix errors first, as listed in the pane Messages.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../export_invoices.js" line="70"/>
+        <location filename="../export_invoices.js" line="74"/>
+        <location filename="../export_invoices.js" line="83"/>
+        <location filename="../export_invoices.js" line="89"/>
+        <location filename="../export_invoices.js" line="99"/>
+        <source>%1 is a required field</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../export_invoices.js" line="121"/>
+        <source>Invoice not valid.
+Error: %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -161,42 +173,42 @@
 <context>
     <name>import_invoices</name>
     <message>
-        <location filename="../import_invoices.js" line="208"/>
+        <location filename="../import_invoices.js" line="217"/>
         <source>The calculated amount for invoice %1 is different from the amount in the imported file. Calculated amount %2, amount imported file: %3</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../import_invoices.js" line="219"/>
+        <location filename="../import_invoices.js" line="228"/>
         <source>The calculated vat amount for invoice %1 is different from the amount in the imported file. Calculated vat amount %2, amount imported file: %3</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../import_invoices.js" line="231"/>
+        <location filename="../import_invoices.js" line="240"/>
         <source>Invoice</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../import_invoices.js" line="232"/>
+        <location filename="../import_invoices.js" line="241"/>
         <source>Reference nr: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../import_invoices.js" line="476"/>
+        <location filename="../import_invoices.js" line="484"/>
         <source>Contact id: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../import_invoices.js" line="476"/>
+        <location filename="../import_invoices.js" line="484"/>
         <source> not found in contact table. Did you import the contacts?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../import_invoices.js" line="478"/>
+        <location filename="../import_invoices.js" line="486"/>
         <source>The calculated amount is different from the amount in your file, invoice nr: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../import_invoices.js" line="480"/>
+        <location filename="../import_invoices.js" line="488"/>
         <source>You are trying to import a &apos;Single line&apos; invoice, import a &apos;Detailed&apos; invoice instead.</source>
         <translation type="unfinished"></translation>
     </message>

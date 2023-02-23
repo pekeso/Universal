@@ -16,7 +16,7 @@
 // @inputfilefilter.de = Text datei (*.csv);;All files (*.*)
 // @inputfilefilter.fr = Fichier text(*.csv);;All files (*.*)
 // @inputfilefilter.it = File testo (*.csv);;All files (*.*)
-// @includejs = ../import_contacts.js
+// @includejs = ../src/import_contacts.js
 
 // Register test case to be executed
 Test.registerTestCase(new ImportContacts());

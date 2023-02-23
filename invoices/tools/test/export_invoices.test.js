@@ -8,7 +8,7 @@
 // @inputdataform = none
 // @task = app.command
 // @timeout = -1
-// @includejs = ../export_invoices.js
+// @includejs = ../src/export_invoices.js
 
 /*
   SUMMARY

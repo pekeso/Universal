@@ -48,6 +48,8 @@ Open vscode user setting file and add the editor for *.ts files
     }
 ```
 
+To open a *.ts file with QtLinguist right click on the file in the file explorer pane and select Open in Application.
+
 NB.: in the operating system you have to assign the *.ts to QtLinquist application.
 
 

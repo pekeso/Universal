@@ -162,28 +162,29 @@ Import rules:
 - The returned result is a [DocumentChange document](https://www.banana.ch/doc/en/node/9641)
 - The DocumentChange file contains the field to be inserted in the Items table.
 
-
 Export rules:
 
 - All avalilabels columns are exported;
 
 ## Tests
 
-Tests are implemented followinf the [BananaApp Test Framework](https://www.banana.ch/doc/en/node/9026). The functionnalities are to be implemented so that test cases can be implmeneted without efforts.
+Tests are implemented following the [BananaApp Test Framework](https://www.banana.ch/doc/en/node/9026). The functionnalities are to be implemented so that test cases can be implmeneted without efforts.
 
 For each functionality a separated test have to be implemented:
 
-- tests/ch.banana.application.invoice.export.contacts.test.js: test for exporting contacts
-- tests/ch.banana.application.invoice.export.invoices.test.js: test for exporting invoices
-- tests/ch.banana.application.invoice.export.items.test.js: test for exporting items
-- tests/ch.banana.application.invoice.import.contacts.test.js: test for importing contacts
-- tests/ch.banana.application.invoice.import.invoices.test.js: test for importing invoices
-- tests/ch.banana.application.invoice.import.items.test.js: test for importing items
+- test/ch.banana.application.invoice.export.contacts.test.js: test for exporting contacts
+- test/ch.banana.application.invoice.export.invoices.test.js: test for exporting invoices
+- test/ch.banana.application.invoice.export.items.test.js: test for exporting items
+- test/ch.banana.application.invoice.import.contacts.test.js: test for importing contacts
+- test/ch.banana.application.invoice.import.invoices.test.js: test for importing invoices
+- test/ch.banana.application.invoice.import.items.test.js: test for importing items
 
 Test input test data is placed under:
 
-- tests/testcases
+- test/testcases
 
 Test exprected results are placed under:
 
-- tests/testexpected
+- test/testexpected
+
+To run the tests with vscode see the document [Seutup environment](doc/setupenv.md)
